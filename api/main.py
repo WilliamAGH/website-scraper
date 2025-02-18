@@ -9,8 +9,8 @@ import logging
 from api.utils.logger import setup_logger
 from urllib.parse import urlparse
 
-# Load environment variables
-load_dotenv()
+# Load environment variables, ignoring comments
+load_dotenv(override=True)
 
 # Initialize logger
 logger = setup_logger(__name__)
@@ -19,15 +19,22 @@ logger = setup_logger(__name__)
 def get_api_port():
     api_port = os.environ.get("API_PORT")
     if api_port:
-        return int(api_port)
+        try:
+            return int(api_port)
+        except ValueError:
+            logger.warning(f"Invalid API_PORT value: {api_port}. Using default port 5000.")
+            return 5000
 
     api_url = os.environ.get("API_URL")
     if api_url:
         try:
-            return int(urlparse(api_url).port or 5000)
-        except (ValueError, TypeError):
-            pass
+            parsed_port = urlparse(api_url).port
+            if parsed_port:
+                return parsed_port
+        except (ValueError, TypeError) as e:
+            logger.warning(f"Could not parse port from API_URL: {api_url}. Using default port 5000.")
 
+    logger.info("No API_PORT or valid API_URL port found. Using default port 5000.")
     return 5000
 
 class Base(DeclarativeBase):
@@ -35,13 +42,26 @@ class Base(DeclarativeBase):
 
 db = SQLAlchemy(model_class=Base)
 
-def create_app():
+def init_app():
     """Create and configure the Flask application."""
     app = Flask(__name__)
 
-    # Get the API and APP URLs from environment
-    api_url = os.environ.get("API_URL", "http://localhost:5000")
-    app_url = os.environ.get("APP_URL", "http://localhost:3000")
+    return app
+
+def create_app():
+    """Create and configure the Flask application."""
+    app = init_app()  # Get the base app
+
+    # Get the API and APP URLs from environment with logging
+    api_url = os.environ.get("API_URL")
+    if not api_url:
+        api_url = "http://localhost:5000"
+        logger.info(f"API_URL not set. Using default: {api_url}")
+    
+    app_url = os.environ.get("APP_URL")
+    if not app_url:
+        app_url = "http://localhost:3000"
+        logger.info(f"APP_URL not set. Using default: {app_url}")
 
     # Enable CORS for development
     CORS(app, resources={
@@ -52,10 +72,20 @@ def create_app():
         }
     })
 
-    app.secret_key = os.environ.get("SESSION_SECRET")
+    # Set secret key with fallback
+    secret_key = os.environ.get("SESSION_SECRET")
+    if not secret_key:
+        secret_key = 'dev_secret_key'
+        logger.warning("SESSION_SECRET not set. Using insecure default for development.")
+    app.secret_key = secret_key
 
-    # Configure the database
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+    # Configure the database with validation
+    database_url = os.environ.get("DATABASE_URL")
+    if not database_url:
+        database_url = "sqlite:///dev.db"
+        logger.info(f"Using default SQLite database: {database_url}")
+    
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
         "pool_recycle": 300,
         "pool_pre_ping": True,
@@ -112,7 +142,7 @@ def create_app():
                 logger.error(f"Health check failed: {str(e)}")
                 return jsonify({"status": "unhealthy", "error": str(e)}), 500
 
-        return app
+    return app
 
 app = create_app()
 

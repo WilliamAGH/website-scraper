@@ -9,6 +9,7 @@ venv/
 ENV/
 .pythonlibs
 .upm
+.env
 
 # Distribution / packaging
 .Python

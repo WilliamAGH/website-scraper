@@ -1,24 +1,20 @@
-cp .env.example .env
-```
+1. Setup local environment variables:
+`cp .env.example .env`
 
 2. Install dependencies:
-```bash
 # Backend
-cd api && uv sync
+`cd api && uv sync`
 
 # Frontend
-cd app && pnpm install
-```
+`cd app && pnpm install`
 
 3. Start the servers:
 
-```bash
 # Terminal 1: Start backend (default: http://localhost:5000)
-cd api && python main.py
+`uv run api/main.py`
 
 # Terminal 2: Start frontend (default: http://localhost:3000)
-cd app && pnpm run dev
-```
+`cd app && pnpm run dev`
 
 ## Development Workflow
 
