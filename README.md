@@ -1,6 +1,8 @@
 # Website Scraper v0.1 - Experimental
 
-A modern, full-stack web application with TypeScript frontend and Python backend.
+You can experiment with the deployed version of this app at [https://webentityscraper.iocloudhost.net/](https://webentityscraper.iocloudhost.net/).
+
+A modern, full-stack web application with type safe JavaScript frontend and Python backend.
 
 ## Quick Start
 
