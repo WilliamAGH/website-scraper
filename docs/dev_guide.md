@@ -8,7 +8,7 @@ uv sync
 cd app && pnpm install
 ```
 
-2. Start development servers:
+## Start development servers:
 ```bash
 # Terminal 1: Start backend
 cd api && python server.py
