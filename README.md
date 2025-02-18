@@ -1,4 +1,4 @@
-# Website Scraper v0.1 - Experimental
+# Website Scraper v0.0.1 - Experimental
 
 You can experiment with the deployed version of this app at [https://webentityscraper.iocloudhost.net/](https://webentityscraper.iocloudhost.net/).
 

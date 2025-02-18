@@ -1,3 +1,4 @@
+## Backend Code (`/api/`)
 api/
    ├── models/       # Data models and schemas
    ├── routes/       # API endpoints
@@ -5,10 +6,8 @@ api/
    │   ├── trpc/     # tRPC endpoints
    │   └── graphql/  # GraphQL schemas
    └── utils/        # Shared utilities
-```
 
-### Frontend Code (`/app/`)
-```
+## Frontend Code (`/app/`)
 app/
    ├── components/   # Reusable UI components
    ├── hooks/        # Custom React hooks
