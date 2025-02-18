@@ -1,10 +1,3 @@
-# Frontend-Backend Integration Guide
-
-This guide explains how to effectively coordinate between the TypeScript frontend (/app/) and Python backend (/api/).
-
-## Architecture Overview
-
-```
 Frontend (/app/)                 Backend (/api/)
 [Port 3000]                     [Port 5000]
 +----------------+              +----------------+
@@ -15,87 +8,41 @@ Frontend (/app/)                 Backend (/api/)
 +----------------+              +----------------+
 ```
 
-## Port Configuration
+## API Endpoints
 
-- Backend API: Port 5000
-  - All API routes are prefixed with `/api/`
-  - Health check available at `/api/health`
-  - Development server: `python main.py`
+### REST API (Base: /api/v1)
+- `/api/health` - Health check endpoint
+- `/api/v1/auth/*` - Authentication endpoints
+  - POST `/register` - User registration
+  - POST `/login` - User login
+  - POST `/logout` - User logout
+- `/api/v1/users/*` - User management
+  - GET `/` - List users
+  - GET `/:id` - Get user details
+- `/api/v1/posts/*` - Post management
+  - GET `/` - List posts
+  - GET `/:id` - Get post details
 
-- Frontend: Port 3000
-  - Development server: `pnpm run dev`
-  - Production build: `pnpm run build`
+### GraphQL
+- `/graphql` - GraphQL endpoint
+  - Supports queries and mutations
+  - Interactive playground available in development
 
-## Integration Best Practices
+### tRPC
+- `/trpc/*` - tRPC endpoints
+  - Type-safe API calls
+  - Automatic type inference
 
-1. **API Communication**
-   - All API endpoints are prefixed with `/api/`
-   - Use type-safe API clients
-   - Handle errors consistently
-   - Implement proper loading states
+## Development Setup
 
-2. **Development Workflow**
-   - Start both servers during development
-   - Backend changes require server restart
-   - Frontend has hot module reloading
+1. Start the Backend (Port 5000):
+```bash
+cd api
+python main.py
+```
 
-3. **Type Safety**
-   - Share types between frontend and backend
-   - Use Pydantic models for API validation
-   - TypeScript interfaces match Pydantic models
-
-4. **Error Handling**
-   - Consistent error response format
-   - Frontend error boundaries
-   - Global error handling
-
-## Common Issues and Solutions
-
-1. **CORS Issues**
-   - Backend is configured to allow frontend origin
-   - Development servers use different ports
-   - Production builds use proper CORS configuration
-
-2. **Port Conflicts**
-   - Backend always uses port 5000
-   - Frontend always uses port 3000
-   - Check for conflicting processes if ports are unavailable
-
-3. **Type Synchronization**
-   - Generate TypeScript types from Pydantic models
-   - Keep API response types in sync
-   - Regular type validation during development
-
-## Development Tips
-
-1. **Local Development**
-   - Run both servers simultaneously
-   - Watch for changes in both directories
-   - Use the development server's hot reload
-
-2. **Testing Integration**
-   - Test API endpoints independently
-   - Verify frontend-backend communication
-   - Use proper error handling
-
-3. **Production Deployment**
-   - Build frontend assets
-   - Configure proper CORS and security headers
-   - Set up proper reverse proxy
-
-## Monitoring and Debugging
-
-1. **Frontend Logs**
-   - Browser console for frontend issues
-   - Network tab for API requests
-   - React DevTools for component debugging
-
-2. **Backend Logs**
-   - Flask debug mode enabled
-   - Detailed error messages
-   - Database query logging
-
-3. **Integration Testing**
-   - Test complete user flows
-   - Verify data consistency
-   - Check error handling
+2. Start the Frontend (Port 3000):
+```bash
+cd app
+pnpm install
+pnpm run dev

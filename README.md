@@ -8,7 +8,7 @@ cd app && pnpm install
 2. Start the servers:
 ```bash
 # Terminal 1: Start backend
-cd api && python server.py  # Runs on http://localhost:5000
+cd api && python main.py  # Runs on http://localhost:5000
 
 # Terminal 2: Start frontend
 cd app && pnpm run dev  # Runs on http://localhost:3000
@@ -24,10 +24,10 @@ The project uses a dual-server setup:
 ## Available Endpoints
 
 Backend (http://localhost:5000):
-- `/` - API information
 - `/api/health` - Health check endpoint
-- `/trpc` - tRPC endpoints (coming soon)
-- `/graphql` - GraphQL endpoint (coming soon)
+- `/api/v1/*` - REST API endpoints
+- `/trpc/*` - tRPC endpoints
+- `/graphql` - GraphQL endpoint
 
 Frontend (http://localhost:3000):
 - Main application interface
@@ -46,12 +46,15 @@ Frontend (http://localhost:3000):
 
 ```
 .
-├── api/              # Python backend code
-│   ├── routes/      # API endpoints (REST, tRPC, GraphQL)
-│   ├── models/      # Data models and schemas
-│   ├── utils/       # Shared utilities
-│   └── server.py    # Backend server entry point
-├── app/             # TypeScript frontend
-│   ├── src/         # Frontend source code
-│   └── ...          # Frontend configuration files
-└── docs/            # Documentation
+├── api/                    # Python backend code
+│   ├── routes/            # API endpoints
+│   │   ├── rest/         # REST API endpoints
+│   │   ├── graphql/      # GraphQL schema and resolvers
+│   │   └── trpc/         # tRPC procedures
+│   ├── models/           # Data models and schemas
+│   ├── utils/            # Shared utilities
+│   └── main.py           # Application entry point
+├── app/                   # TypeScript frontend
+│   ├── src/              # Frontend source code
+│   └── ...               # Frontend configuration files
+└── docs/                 # Documentation
