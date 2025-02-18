@@ -12,8 +12,8 @@ env/
 .qodo
 venv/
 ENV/
-.pythonlibs
-.upm
+.pythonlibs/*
+.upm/*
 .env
 
 # Distribution / packaging
