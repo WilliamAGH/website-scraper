@@ -7,10 +7,10 @@ cd app && pnpm install
 
 2. Start the servers:
 ```bash
-# Backend API server
-python main.py  # Runs on http://localhost:5000
+# Terminal 1: Start backend
+cd api && python server.py  # Runs on http://localhost:5000
 
-# Frontend development server
+# Terminal 2: Start frontend
 cd app && pnpm run dev  # Runs on http://localhost:3000
 ```
 
@@ -46,10 +46,12 @@ Frontend (http://localhost:3000):
 
 ```
 .
-├── api/               # Python backend code
-│   ├── routes/       # API endpoints (REST, tRPC, GraphQL)
-│   ├── models/       # Data models and schemas
-│   └── utils/        # Shared utilities
-├── app/              # TypeScript frontend (upcoming)
-├── docs/             # Documentation
-└── main.py          # Application entry point
+├── api/              # Python backend code
+│   ├── routes/      # API endpoints (REST, tRPC, GraphQL)
+│   ├── models/      # Data models and schemas
+│   ├── utils/       # Shared utilities
+│   └── server.py    # Backend server entry point
+├── app/             # TypeScript frontend
+│   ├── src/         # Frontend source code
+│   └── ...          # Frontend configuration files
+└── docs/            # Documentation

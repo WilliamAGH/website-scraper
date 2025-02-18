@@ -11,7 +11,7 @@ cd app && pnpm install
 2. Start development servers:
 ```bash
 # Terminal 1: Start backend
-python main.py
+cd api && python server.py
 
 # Terminal 2: Start frontend
 cd app && pnpm run dev
