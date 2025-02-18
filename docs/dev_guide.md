@@ -49,7 +49,31 @@
 ## Getting Started
 
 1. Clone the repository
-2. Install uv package manager
-3. Install dependencies: `uv pip install -e .`
-4. Start the server: `python main.py`
-5. Visit http://localhost:5000/api/health to verify
+
+2. Install uv package manager (https://github.com/astral/uv)
+
+3. Project Commands:
+   - `uv init`: Create a new Python project
+   - `uv add`: Add a dependency to the project
+   - `uv remove`: Remove a dependency from the project
+   - `uv sync`: Sync project dependencies with the environment
+   - `uv lock`: Create a lockfile for dependencies
+   - `uv run`: Run a command in the project environment
+   - `uv tree`: View the dependency tree
+   - `uv build`: Build distribution archives
+   - `uv publish`: Publish to a package index
+
+4. Script Commands:
+   - `uv run`: Run a script
+   - `uv add --script`: Add a dependency to a script
+   - `uv remove --script`: Remove a dependency from a script
+
+5. Tool Commands:
+   - `uvx` / `uv tool run`: Run a tool in temporary environment
+   - `uv tool install`: Install a tool user-wide
+   - `uv tool uninstall`: Uninstall a tool
+   - `uv tool list`: List installed tools
+   - `uv tool update-shell`: Update shell for tool executables
+
+6. Start the server: `python main.py`
+7. Visit http://localhost:5000/api/health to verify
