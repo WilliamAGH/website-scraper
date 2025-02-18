@@ -1,28 +1,46 @@
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-2. Install dependencies:
-```bash
+# Backend dependencies
 uv sync
+
+# Frontend dependencies
+cd app && pnpm install
 ```
 
-3. Run the server:
+2. Start the servers:
 ```bash
-python main.py
+# Backend API server
+python main.py  # Runs on http://localhost:5000
+
+# Frontend development server
+cd app && pnpm run dev  # Runs on http://localhost:3000
 ```
 
-The server will start at http://localhost:5000. Available endpoints:
+## Development Workflow
+
+The project uses a dual-server setup:
+- Backend API server runs on port 5000
+- Frontend development server runs on port 3000
+- Frontend automatically proxies API requests to the backend
+
+## Available Endpoints
+
+Backend (http://localhost:5000):
 - `/` - API information
 - `/api/health` - Health check endpoint
 - `/trpc` - tRPC endpoints (coming soon)
 - `/graphql` - GraphQL endpoint (coming soon)
 
+Frontend (http://localhost:3000):
+- Main application interface
+- Dark/light mode toggle
+- Responsive design
+
 ## Documentation
 
-- [API Documentation](docs/api.md) - Detailed API endpoint documentation
-- [Application Guidelines](docs/app.md) - Frontend architecture and styling guidelines
-- [Repository Rules](docs/repo_rules.md) - Code organization and type safety requirements
-- [Developer Guide](docs/dev_guide.md) - Development workflow and best practices
+- [API Documentation](docs/api.md) - Backend API endpoints and usage
+- [Frontend Guide](docs/frontend.md) - Frontend architecture and components
+- [Integration Guide](docs/integration.md) - Frontend-Backend integration guide
+- [Development Guide](docs/dev_guide.md) - Development workflow and best practices
+- [Repository Rules](docs/repo_rules.md) - Code organization and type safety
 
 ## Project Structure
 
