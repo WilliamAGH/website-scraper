@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Prevent iOS zoom on input focus -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<!-- Preload key assets -->
+<link rel="preload" href="{{ url_for('static', filename='images/LoadingAnimation.mp4') }}" as="video" type="video/mp4">
+<link rel="preload" href="{{ url_for('static', filename='images/LoadingScreen.svg') }}" as="image" type="image/svg+xml">
+
+<div class="loading-page">
+    <div class="loading-container">
+        <!-- Fallback image shown first while video loads -->
+        <img id="fallbackImage" 
+             src="{{ url_for('static', filename='images/LoadingScreen.svg') }}" 
+             alt="Loading..." 
+             class="loading-animation">
+             
+        <video id="loadingVideo" 
+               autoplay 
+               loop 
+               muted 
+               playsinline 
+               preload="auto"
+               class="loading-animation" 
+               style="display: none;"
+               poster="{{ url_for('static', filename='images/LoadingScreen.svg') }}">
+            <source src="{{ url_for('static', filename='images/LoadingAnimation.mp4') }}" type="video/mp4">
+        </video>
+        <div class="loading-text">Analyzing website content...</div>
+    </div>
+</div>
+
+<script>
+// Video loading and fallback handling
+document.addEventListener('DOMContentLoaded', function() {
+    const video = document.getElementById('loadingVideo');
+    const fallbackImage = document.getElementById('fallbackImage');
+    let playAttempts = 0;
+    const maxPlayAttempts = 3;
+
+    function showFallback() {
+        video.style.display = 'none';
+        fallbackImage.style.display = 'block';
+    }
+
+    function showVideo() {
+        video.style.display = 'block';
+        fallbackImage.style.display = 'none';
+    }
+
+    function attemptPlay() {
+        if (playAttempts >= maxPlayAttempts) {
+            console.warn('Max play attempts reached, staying with fallback image');
+            showFallback();
+            return;
+        }
+
+        playAttempts++;
+        console.log(`Play attempt ${playAttempts}/${maxPlayAttempts}`);
+
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    console.log('Video playback started successfully');
+                    showVideo();
+                })
+                .catch(error => {
+                    console.warn(`Video playback failed (attempt ${playAttempts}):`, error);
+                    if (playAttempts < maxPlayAttempts) {
+                        // Wait a bit longer between each retry
+                        setTimeout(attemptPlay, 1000 * playAttempts);
+                    } else {
+                        showFallback();
+                    }
+                });
+        } else {
+            // Browser doesn't return a promise (older browsers)
+            if (video.paused) {
+                console.warn('Video failed to play (no promise)');
+                showFallback();
+            } else {
+                showVideo();
+            }
+        }
+    }
+
+    // Start loading the video
+    video.load();
+
+    // Check if video can be played at all
+    video.addEventListener('canplay', function() {
+        console.log('Video can be played, attempting playback');
+        attemptPlay();
+    });
+
+    // Handle video errors
+    video.addEventListener('error', function(e) {
+        console.error('Video error:', e);
+        showFallback();
+    });
+
+    // Periodic check to ensure video is still playing
+    const playbackCheck = setInterval(() => {
+        if (video.style.display !== 'none' && video.paused) {
+            console.warn('Video playback interrupted, attempting restart');
+            attemptPlay();
+        }
+    }, 2000);
+
+    // Cleanup
+    window.addEventListener('beforeunload', () => {
+        clearInterval(playbackCheck);
+    });
+});
+
+// Analysis handling
+document.addEventListener('DOMContentLoaded', async function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const url = urlParams.get('url');
+    
+    if (!url) {
+        window.location.href = "{{ url_for('index') }}";
+        return;
+    }
+
+    try {
+        console.log('Starting analysis for:', url);
+        const response = await fetch(`/api/analyze?url=${encodeURIComponent(url)}`);
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error('Analysis failed');
+        }
+        
+        const data = await response.json();
+        console.log('Analysis data received:', data);
+        
+        if (data.error) {
+            throw new Error(data.error);
+        }
+
+        sessionStorage.setItem('analysisResults', JSON.stringify(data));
+        console.log('Data stored in sessionStorage');
+        
+        window.location.href = `{{ url_for('analysis_results') }}?url=${encodeURIComponent(url)}`;
+    } catch (error) {
+        console.error('Analysis failed:', error);
+        window.location.href = `{{ url_for('index') }}?error=${encodeURIComponent(error.message)}`;
+    }
+});
+</script>
+{% endblock %} 

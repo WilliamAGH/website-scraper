@@ -1,0 +1,363 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="results-card">
+                <div class="results-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="results-title">
+                            <i class="fas fa-chart-bar fa-sm"></i> Analysis Results
+                        </h3>
+                        <a href="{{ url_for('index') }}" class="back-button">
+                            <i class="fas fa-arrow-left"></i> New Analysis
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Loading state -->
+                <div id="loadingState" class="d-none">
+                    <div class="info-body text-center py-5">
+                        <div class="spinner-border text-primary mb-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mb-0">Analyzing website content...</p>
+                    </div>
+                </div>
+
+                <!-- Error message -->
+                <div id="resultsError" class="alert alert-danger d-none" role="alert"></div>
+
+                <!-- Results content -->
+                <div id="resultsContent">
+                    <div class="info-card">
+                        <div class="info-header">
+                            <h4>Organization Information</h4>
+                        </div>
+                        <div class="info-body">
+                            <p><strong>Name:</strong> <span id="orgName">-</span></p>
+                            <p><strong>Type:</strong> <span id="orgType">-</span></p>
+                            <p><strong>Location:</strong> <span id="orgLocation">-</span></p>
+                            <p><strong>Industry:</strong> <span id="orgIndustry">-</span></p>
+                            <p><strong>Size:</strong> <span id="orgSize">-</span></p>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-header">
+                            <h4>Content Analysis</h4>
+                        </div>
+                        <div class="info-body">
+                            <p><strong>Primary Purpose:</strong> <span id="primaryPurpose">-</span></p>
+                            <p><strong>Target Audience:</strong> <span id="targetAudience">-</span></p>
+                            <p><strong>Content Type:</strong> <span id="contentType">-</span></p>
+                            <p><strong>Writing Style:</strong> <span id="writingStyle">-</span></p>
+                            <div class="mb-3">
+                                <strong>Key Highlights:</strong>
+                                <div id="keyHighlights" class="mt-2">-</div>
+                            </div>
+                            <div class="mb-2">
+                                <strong>Topics:</strong>
+                                <div id="topics" class="mt-2">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-header">
+                            <h4>Professional Context</h4>
+                        </div>
+                        <div class="info-body">
+                            <div class="mb-3">
+                                <strong>Areas of Expertise:</strong>
+                                <div id="expertiseAreas" class="mt-2">-</div>
+                            </div>
+                            <p><strong>Background:</strong> <span id="background">-</span></p>
+                            <p><strong>Current Focus:</strong> <span id="currentFocus">-</span></p>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-header">
+                            <h4>Social Presence</h4>
+                        </div>
+                        <div class="info-body">
+                            <div class="mb-3">
+                                <strong>Platforms:</strong>
+                                <div id="platforms" class="mt-2">-</div>
+                            </div>
+                            <p><strong>Engagement Level:</strong> <span id="engagementLevel">-</span></p>
+                            <div class="mb-3">
+                                <strong>Professional Networks:</strong>
+                                <div id="professionalNetworks" class="mt-2">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-header">
+                            <h4>Location Analysis</h4>
+                        </div>
+                        <div class="info-body">
+                            <p><strong>Determined Location:</strong> <span id="determinedLocation">-</span></p>
+                            <p><strong>Confidence Score:</strong> <span id="confidenceScore">-</span></p>
+                            <div class="mb-2">
+                                <strong>Supporting Signals:</strong>
+                                <div id="supportingSignals" class="mt-2">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-header">
+                            <h4>Tags</h4>
+                        </div>
+                        <div class="info-body">
+                            <div id="tags">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Results page specific JavaScript
+(function() {
+    document.addEventListener('DOMContentLoaded', async function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const url = urlParams.get('url');
+        
+        if (!url) {
+            window.location.href = "{{ url_for('index') }}";
+            return;
+        }
+
+        const loadingState = document.getElementById('loadingState');
+        const resultsError = document.getElementById('resultsError');
+        const resultsContent = document.getElementById('resultsContent');
+
+        function showLoading() {
+            loadingState.classList.remove('d-none');
+            resultsError.classList.add('d-none');
+            resultsContent.classList.add('d-none');
+        }
+
+        function hideLoading() {
+            loadingState.classList.add('d-none');
+        }
+
+        function capitalizeFirstLetter(string) {
+            if (!string) return 'N/A';
+            return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+        }
+
+        function capitalizeArrayItems(array) {
+            if (!array || !Array.isArray(array)) return [];
+            return array.map(item => capitalizeFirstLetter(item));
+        }
+
+        function showError(message) {
+            hideLoading();
+            resultsError.textContent = message;
+            resultsError.classList.remove('d-none');
+            resultsContent.classList.add('d-none');
+        }
+
+        function showResults(data) {
+            hideLoading();
+            console.log('Displaying results:', data);
+            resultsError.classList.add('d-none');
+            resultsContent.classList.remove('d-none');
+
+            try {
+                // Organization Information
+                document.getElementById('orgName').textContent = data?.organization?.name || 'N/A';
+                document.getElementById('orgType').textContent = capitalizeFirstLetter(data?.organization?.type) || 'N/A';
+                document.getElementById('orgLocation').textContent = data?.organization?.location || 'N/A';
+                document.getElementById('orgIndustry').textContent = capitalizeFirstLetter(data?.organization?.industry) || 'N/A';
+                document.getElementById('orgSize').textContent = capitalizeFirstLetter(data?.organization?.size_indication) || 'N/A';
+            } catch (error) {
+                console.warn('Error displaying organization information:', error);
+            }
+
+            try {
+                // Content Analysis
+                document.getElementById('primaryPurpose').textContent = capitalizeFirstLetter(data?.content_analysis?.primary_purpose) || 'N/A';
+                document.getElementById('targetAudience').textContent = capitalizeFirstLetter(data?.content_analysis?.target_audience) || 'N/A';
+                document.getElementById('contentType').textContent = capitalizeFirstLetter(data?.content_analysis?.content_type) || 'N/A';
+                document.getElementById('writingStyle').textContent = capitalizeFirstLetter(data?.content_analysis?.writing_style) || 'N/A';
+            } catch (error) {
+                console.warn('Error displaying content analysis:', error);
+            }
+
+            try {
+                // Key Highlights
+                const highlightsContainer = document.getElementById('keyHighlights');
+                if (data?.content_analysis?.key_highlights?.length > 0) {
+                    const highlights = data.content_analysis.key_highlights
+                        .filter(highlight => highlight) // Filter out null/undefined
+                        .map(highlight => 
+                            `<div class="badge badge-primary">${capitalizeFirstLetter(highlight)}</div>`
+                        ).join('');
+                    highlightsContainer.innerHTML = highlights || 'No highlights available';
+                } else {
+                    highlightsContainer.textContent = 'No highlights available';
+                }
+            } catch (error) {
+                console.warn('Error displaying highlights:', error);
+                document.getElementById('keyHighlights').textContent = 'No highlights available';
+            }
+
+            try {
+                // Topics
+                const topicsContainer = document.getElementById('topics');
+                if (data?.content_analysis?.topics?.length > 0) {
+                    const capitalizedTopics = data.content_analysis.topics
+                        .filter(topic => topic) // Filter out null/undefined
+                        .map(topic => capitalizeFirstLetter(topic));
+                    const topicBadges = capitalizedTopics.map(topic => 
+                        `<span class="badge badge-primary">${topic}</span>`
+                    ).join('');
+                    topicsContainer.innerHTML = topicBadges || 'No topics identified';
+                } else {
+                    topicsContainer.textContent = 'No topics identified';
+                }
+            } catch (error) {
+                console.warn('Error displaying topics:', error);
+                document.getElementById('topics').textContent = 'No topics identified';
+            }
+
+            try {
+                // Professional Context
+                const expertiseContainer = document.getElementById('expertiseAreas');
+                if (data?.professional_context?.expertise_areas?.length > 0) {
+                    const expertise = data.professional_context.expertise_areas
+                        .filter(area => area) // Filter out null/undefined
+                        .map(area => 
+                            `<span class="badge badge-secondary">${capitalizeFirstLetter(area)}</span>`
+                        ).join('');
+                    expertiseContainer.innerHTML = expertise || 'No expertise areas listed';
+                } else {
+                    expertiseContainer.textContent = 'No expertise areas listed';
+                }
+                
+                document.getElementById('background').textContent = capitalizeFirstLetter(data?.professional_context?.background) || 'N/A';
+                document.getElementById('currentFocus').textContent = capitalizeFirstLetter(data?.professional_context?.current_focus) || 'N/A';
+            } catch (error) {
+                console.warn('Error displaying professional context:', error);
+            }
+
+            try {
+                // Social Presence
+                const platformsContainer = document.getElementById('platforms');
+                if (data?.social_presence?.platforms?.length > 0) {
+                    const platforms = data.social_presence.platforms
+                        .filter(platform => platform) // Filter out null/undefined
+                        .map(platform => 
+                            `<span class="badge badge-primary">${capitalizeFirstLetter(platform)}</span>`
+                        ).join('');
+                    platformsContainer.innerHTML = platforms || 'No platforms detected';
+                } else {
+                    platformsContainer.textContent = 'No platforms detected';
+                }
+
+                document.getElementById('engagementLevel').textContent = capitalizeFirstLetter(data?.social_presence?.engagement_level) || 'N/A';
+
+                const networksContainer = document.getElementById('professionalNetworks');
+                if (data?.social_presence?.professional_networks?.length > 0) {
+                    const networks = data.social_presence.professional_networks
+                        .filter(network => network) // Filter out null/undefined
+                        .map(network => 
+                            `<span class="badge badge-secondary">${capitalizeFirstLetter(network)}</span>`
+                        ).join('');
+                    networksContainer.innerHTML = networks || 'No professional networks listed';
+                } else {
+                    networksContainer.textContent = 'No professional networks listed';
+                }
+            } catch (error) {
+                console.warn('Error displaying social presence:', error);
+            }
+
+            try {
+                // Location Analysis
+                document.getElementById('determinedLocation').textContent = data?.location_confidence?.determined_location || 'N/A';
+                document.getElementById('confidenceScore').textContent = 
+                    data?.location_confidence?.confidence_score ? 
+                    `${Math.round(data.location_confidence.confidence_score * 100)}%` : 
+                    'N/A';
+
+                const signalsContainer = document.getElementById('supportingSignals');
+                if (data?.location_confidence?.supporting_signals?.length > 0) {
+                    const signals = data.location_confidence.supporting_signals
+                        .filter(signal => signal) // Filter out null/undefined
+                        .map(signal => 
+                            `<span class="badge badge-secondary">${signal}</span>`
+                        ).join('');
+                    signalsContainer.innerHTML = signals || 'No supporting signals available';
+                } else {
+                    signalsContainer.textContent = 'No supporting signals available';
+                }
+            } catch (error) {
+                console.warn('Error displaying location analysis:', error);
+            }
+
+            try {
+                // Tags
+                const tagsContainer = document.getElementById('tags');
+                if (data?.tags?.length > 0) {
+                    const capitalizedTags = data.tags
+                        .filter(tag => tag) // Filter out null/undefined
+                        .map(tag => capitalizeFirstLetter(tag));
+                    const tagBadges = capitalizedTags.map(tag => 
+                        `<span class="badge badge-secondary">${tag}</span>`
+                    ).join('');
+                    tagsContainer.innerHTML = tagBadges || 'No tags available';
+                } else {
+                    tagsContainer.textContent = 'No tags available';
+                }
+            } catch (error) {
+                console.warn('Error displaying tags:', error);
+                document.getElementById('tags').textContent = 'No tags available';
+            }
+        }
+
+        try {
+            const storedResults = sessionStorage.getItem('analysisResults');
+            console.log('Stored results:', storedResults);
+            
+            if (storedResults) {
+                const data = JSON.parse(storedResults);
+                console.log('Parsed stored data:', data);
+                showResults(data);
+                sessionStorage.removeItem('analysisResults');
+                return;
+            }
+
+            console.log('No stored results found, fetching from API...');
+            showLoading();
+            
+            const response = await fetch(`/api/analyze?url=${encodeURIComponent(url)}`);
+            console.log('API response status:', response.status);
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch results');
+            }
+            
+            const data = await response.json();
+            console.log('API response data:', data);
+            
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            showResults(data);
+        } catch (error) {
+            console.error('Error handling results:', error);
+            showError(error.message || 'Failed to load analysis results');
+        }
+    });
+})();
+</script>
+{% endblock %} 

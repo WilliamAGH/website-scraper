@@ -2,12 +2,12 @@
 
 ## Frontend Architecture
 
-The frontend will be built with TypeScript and modern best practices.
+The frontend uses React, TypeScript, and Vite with modern best practices.
 
 ### Styling Guidelines
 
 #### CSS Framework
-- Tailwind CSS with modern chad cn utility classes
+- Tailwind CSS and Shad CN with modern utility classes
 - Component-first approach
 
 #### Design Principles

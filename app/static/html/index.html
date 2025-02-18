@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Preload loading page assets -->
+<link rel="prefetch" href="{{ url_for('static', filename='images/LoadingAnimation.mp4') }}" as="video" type="video/mp4">
+<link rel="prefetch" href="{{ url_for('static', filename='images/LoadingScreen.svg') }}" as="image" type="image/svg+xml">
+<link rel="preload" href="{{ url_for('loading') }}?preload=true" as="fetch" crossorigin="anonymous">
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="search-card">
+            <div class="search-card-body">
+                <h2 class="search-title">
+                    <i class="fas fa-search"></i> Analyze Website
+                </h2>
+
+                <form id="analyzeForm" class="mb-4" action="{{ url_for('loading') }}" method="GET">
+                    <div class="search-group">
+                        <div class="input-wrapper">
+                            <input type="text" class="search-input" id="url" name="url" 
+                                   placeholder="Enter a website URL" 
+                                   data-placeholder-mobile="apple.com"
+                                   data-placeholder-desktop="Enter a website URL (e.g., apple.com)"
+                                   required>
+                            <button class="search-button" type="submit" aria-label="Analyze Website">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div id="errorMessage" class="alert alert-danger d-none" role="alert"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden elements for preloading -->
+<div style="display: none;">
+    <!-- Preload video -->
+    <video id="preloadVideo" preload="auto" muted>
+        <source src="{{ url_for('static', filename='images/LoadingAnimation.mp4') }}" type="video/mp4">
+    </video>
+    <!-- Preload SVG -->
+    <img src="{{ url_for('static', filename='images/LoadingScreen.svg') }}" alt="" id="preloadSVG">
+</div>
+
+<script>
+// Preload loading page assets
+document.addEventListener('DOMContentLoaded', function() {
+    // Preload the loading page HTML
+    fetch('{{ url_for("loading") }}?preload=true')
+        .then(response => response.text())
+        .then(html => {
+            // Create a hidden div to store the preloaded content
+            const preloadDiv = document.createElement('div');
+            preloadDiv.style.display = 'none';
+            preloadDiv.innerHTML = html;
+            document.body.appendChild(preloadDiv);
+        })
+        .catch(error => console.warn('Loading page preload failed:', error));
+        
+    // Preload video and check compatibility
+    const video = document.getElementById('preloadVideo');
+    if (video) {
+        video.load();
+        // Test if video can play
+        video.play().then(() => {
+            video.pause();
+            console.log('Video preload successful');
+        }).catch(err => {
+            console.warn('Video playback not supported:', err);
+        });
+    }
+});
+
+// Form submission handler
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle responsive placeholder text
+    const input = document.getElementById('url');
+    const mobileWidth = 768; // Match our CSS breakpoint
+
+    function updatePlaceholder() {
+        const isMobile = window.innerWidth <= mobileWidth;
+        input.placeholder = input.getAttribute(
+            isMobile ? 'data-placeholder-mobile' : 'data-placeholder-desktop'
+        );
+    }
+
+    // Update on load
+    updatePlaceholder();
+
+    // Update on resize
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(updatePlaceholder, 100);
+    });
+
+    // Form submission handler
+    document.getElementById('analyzeForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const url = document.getElementById('url').value;
+        window.location.href = `{{ url_for('loading') }}?url=${encodeURIComponent(url)}`;
+    });
+});
+</script>
+{% endblock %}

@@ -1,4 +1,4 @@
-# aVenture v2 Mini
+# Website Scraper v0.1 - Experimental
 
 A modern, full-stack web application with TypeScript frontend and Python backend.
 

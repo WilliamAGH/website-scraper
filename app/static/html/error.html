@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - Website Entity Scraper</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+</head>
+<body>
+    <div class="error-container">
+        {% if error_code == 404 %}
+        <img src="{{ url_for('static', filename='images/error/404notfound.png') }}" alt="404 Not Found" class="error-image">
+        {% else %}
+        <img src="{{ url_for('static', filename='images/error/500other.png') }}" alt="Error Occurred" class="error-image">
+        {% endif %}
+        <h1>{{ error_title|default('Oops! Something went wrong') }}</h1>
+        <p class="error-message">{{ error_message|default('We encountered an unexpected error. Our team has been notified.') }}</p>
+        {% if error_code %}
+        <p class="error-code">Error Code: {{ error_code }}</p>
+        {% endif %}
+        
+        <div class="error-feedback">
+            <h2>Help us improve</h2>
+            <p>Tell us what happened (optional)</p>
+            <form action="{{ url_for('submit_error_feedback') }}" method="POST" class="feedback-form">
+                <input type="hidden" name="error_id" value="{{ error_id }}">
+                <input type="hidden" name="error_code" value="{{ error_code }}">
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="Your email (optional)" class="feedback-input">
+                </div>
+                <div class="form-group">
+                    <textarea name="message" placeholder="What were you trying to do?" class="feedback-input" rows="3"></textarea>
+                </div>
+                <button type="submit" class="button feedback-submit">Send Feedback</button>
+            </form>
+        </div>
+
+        <div class="error-actions">
+            <a href="{{ url_for('index') }}" class="button">Return to Home</a>
+            {% if show_retry %}
+            <button onclick="window.location.reload()" class="button secondary">Try Again</button>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html> 

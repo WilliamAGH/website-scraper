@@ -31,8 +31,7 @@ For optimal development experience, configure your IDE with:
 
 #### VSCode
 1. Install recommended extensions:
-   - ESLint
-   - Prettier
+   - ESLint with TypeScript support & Formatting
    - Python
    - Tailwind CSS IntelliSense
 

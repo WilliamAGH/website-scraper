@@ -1,0 +1,35 @@
+{
+    "include": [
+        "."
+    ],
+    "exclude": [
+        "**/node_modules",
+        "**/__pycache__",
+        "**/.venv/**",
+        "**/site-packages/**",
+        "/Library/Frameworks/Python.framework/**",
+        "~/Library/**",
+        "/Library/**",
+        "/bin/**",
+        "build",
+        "dist"
+    ],
+    "ignore": [
+        ".venv",
+        "site-packages",
+        "/Library/Frameworks/Python.framework",
+        "/bin"
+    ],
+    "defineConstant": {
+        "DEBUG": true
+    },
+    "stubPath": "types_def/stubs",
+    "reportMissingImports": true,
+    "reportMissingTypeStubs": false,
+    "pythonVersion": "3.12",
+    "pythonPlatform": "Darwin",
+    "typeCheckingMode": "basic",
+    "useLibraryCodeForTypes": true,
+    "reportGeneralTypeIssues": "warning",
+    "reportMissingModuleSource": "warning"
+} 
