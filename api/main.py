@@ -7,12 +7,28 @@ from dotenv import load_dotenv
 import os
 import logging
 from api.utils.logger import setup_logger
+from urllib.parse import urlparse
 
 # Load environment variables
 load_dotenv()
 
 # Initialize logger
 logger = setup_logger(__name__)
+
+# Get port from environment variables with fallback logic
+def get_api_port():
+    api_port = os.environ.get("API_PORT")
+    if api_port:
+        return int(api_port)
+
+    api_url = os.environ.get("API_URL")
+    if api_url:
+        try:
+            return int(urlparse(api_url).port or 5000)
+        except (ValueError, TypeError):
+            pass
+
+    return 5000
 
 class Base(DeclarativeBase):
     pass
@@ -22,10 +38,15 @@ db = SQLAlchemy(model_class=Base)
 def create_app():
     """Create and configure the Flask application."""
     app = Flask(__name__)
+
+    # Get the API and APP URLs from environment
+    api_url = os.environ.get("API_URL", "http://localhost:5000")
+    app_url = os.environ.get("APP_URL", "http://localhost:3000")
+
     # Enable CORS for development
     CORS(app, resources={
         r"/api/*": {
-            "origins": ["http://localhost:3000", "http://127.0.0.1:3000"],
+            "origins": [app_url],
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"]
         }
@@ -80,9 +101,13 @@ def create_app():
         def health_check():
             """Health check endpoint."""
             try:
-                # Use SQLAlchemy's text() function to properly declare the SQL query
                 db.session.execute(text("SELECT 1"))
-                return jsonify({"status": "healthy", "database": "connected"})
+                return jsonify({
+                    "status": "healthy",
+                    "database": "connected",
+                    "api_url": os.environ.get("API_URL"),
+                    "app_url": os.environ.get("APP_URL")
+                })
             except Exception as e:
                 logger.error(f"Health check failed: {str(e)}")
                 return jsonify({"status": "unhealthy", "error": str(e)}), 500
@@ -92,4 +117,6 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    port = get_api_port()
+    logger.info(f"Starting server on port {port}")
+    app.run(host="0.0.0.0", port=port, debug=True)

@@ -10,12 +10,12 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
+    port: process.env.APP_PORT ? parseInt(process.env.APP_PORT) : 3000,
     host: true,
     strictPort: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: process.env.API_URL || 'http://localhost:5000',
         changeOrigin: true,
         secure: false,
       },

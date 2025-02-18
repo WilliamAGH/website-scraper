@@ -1,35 +1,45 @@
-# Backend dependencies
-uv sync
+cp .env.example .env
+```
 
-# Frontend dependencies
+2. Install dependencies:
+```bash
+# Backend
+cd api && uv sync
+
+# Frontend
 cd app && pnpm install
 ```
 
-2. Start the servers:
-```bash
-# Terminal 1: Start backend
-cd api && python main.py  # Runs on http://localhost:5000
+3. Start the servers:
 
-# Terminal 2: Start frontend
-cd app && pnpm run dev  # Runs on http://localhost:3000
+```bash
+# Terminal 1: Start backend (default: http://localhost:5000)
+cd api && python main.py
+
+# Terminal 2: Start frontend (default: http://localhost:3000)
+cd app && pnpm run dev
 ```
 
 ## Development Workflow
 
-The project uses a dual-server setup:
-- Backend API server runs on port 5000
-- Frontend development server runs on port 3000
+The project uses a dual-server setup with configurable ports:
+- Backend API server (default: port 5000)
+- Frontend development server (default: port 3000)
 - Frontend automatically proxies API requests to the backend
+
+Port configuration can be customized via environment variables:
+- Use `API_PORT` and `APP_PORT` for explicit port overrides
+- Alternatively, ports can be extracted from `API_URL` and `APP_URL`
 
 ## Available Endpoints
 
-Backend (http://localhost:5000):
+Backend (default: http://localhost:5000):
 - `/api/health` - Health check endpoint
 - `/api/v1/*` - REST API endpoints
 - `/trpc/*` - tRPC endpoints
 - `/graphql` - GraphQL endpoint
 
-Frontend (http://localhost:3000):
+Frontend (default: http://localhost:3000):
 - Main application interface
 - Dark/light mode toggle
 - Responsive design
