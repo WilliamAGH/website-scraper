@@ -2,6 +2,7 @@ from flask import Flask, jsonify, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import text
 from dotenv import load_dotenv
 import os
 import logging
@@ -79,7 +80,8 @@ def create_app():
         def health_check():
             """Health check endpoint."""
             try:
-                db.session.execute("SELECT 1")
+                # Use SQLAlchemy's text() function to properly declare the SQL query
+                db.session.execute(text("SELECT 1"))
                 return jsonify({"status": "healthy", "database": "connected"})
             except Exception as e:
                 logger.error(f"Health check failed: {str(e)}")
