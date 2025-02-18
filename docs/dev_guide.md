@@ -15,23 +15,41 @@
 4. Follow DRY principles
 
 ### Backend Development
-- All backend functionality must be in Python
-- Keep all Python code under /api/
-- Use appropriate error handling
-- Implement proper logging
+1. All backend functionality must be in Python
+   - Keep all Python code under /api/
+   - Use appropriate error handling
+   - Implement proper logging
+
+2. API Design
+   - RESTful endpoints under /api/routes/rest/
+   - tRPC endpoints under /api/routes/trpc/
+   - GraphQL schemas under /api/routes/graphql/
+
+3. Database Operations
+   - Use SQLAlchemy for database interactions
+   - Implement proper migrations
+   - Handle transactions carefully
 
 ### Frontend Development
-- UI code only in app/
-- Use proper component composition
-- Implement proper state management
-- Follow accessibility guidelines
+1. UI code only in app/
+2. Use proper component composition
+3. Implement proper state management
+4. Follow accessibility guidelines
 
 ### Testing
-- Write unit tests for all new functionality
-- Maintain test coverage
-- Use appropriate mocking
+1. Write unit tests for all new functionality
+2. Maintain test coverage
+3. Use appropriate mocking
 
 ### Documentation
-- Keep documentation up-to-date
-- Document all API changes
-- Include examples in documentation
+1. Keep documentation up-to-date
+2. Document all API changes
+3. Include examples in documentation
+
+## Getting Started
+
+1. Clone the repository
+2. Install uv package manager
+3. Install dependencies: `uv pip install -e .`
+4. Start the server: `python main.py`
+5. Visit http://localhost:5000/api/health to verify

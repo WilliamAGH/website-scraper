@@ -1,22 +1,34 @@
-# API Documentation
+{
+      "status": "healthy",
+      "version": "1.0.0"
+    }
+    ```
 
-## REST API
+## tRPC (Coming Soon)
 
-All REST endpoints are prefixed with `/api`.
+tRPC endpoints will be available at `/trpc`.
 
-### Health Check
-- GET `/api/health`
-  - Returns server status and version
+### Planned Features
+- Type-safe API calls
+- Real-time subscriptions
+- Automatic TypeScript type generation
 
-## tRPC
+## GraphQL (Coming Soon)
 
-tRPC endpoints are available at `/trpc`.
+GraphQL endpoint will be available at `/graphql`.
 
-### Available Procedures
-- `hello` - Sample query that returns a greeting
+### Planned Features
+- Schema-first development
+- Type-safe resolvers with Strawberry
+- Interactive GraphQL Playground
 
-## GraphQL
+## API Development Guidelines
 
-GraphQL endpoint is available at `/graphql`.
-
-### Schema
+1. All endpoints must be documented
+2. Every response must include proper type hints
+3. Error responses should follow standard format:
+   ```json
+   {
+     "error": "Error message",
+     "details": {} // Optional details object
+   }

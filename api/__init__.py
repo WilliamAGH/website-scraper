@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import os
 
@@ -13,6 +13,22 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Initialize extensions
 db = SQLAlchemy(app)
+
+# Root endpoint
+@app.route('/')
+def index():
+    """Root endpoint that provides API information."""
+    return jsonify({
+        "name": "mini-api-v2",
+        "version": "0.1.0",
+        "description": "A strongly-typed Python API server",
+        "endpoints": {
+            "rest": "/api",
+            "trpc": "/trpc",
+            "graphql": "/graphql",
+            "health": "/api/health"
+        }
+    })
 
 # Import routes
 from api.routes.rest import health
