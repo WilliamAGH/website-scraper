@@ -1,6 +1,7 @@
 # Python
 __pycache__/
-__pycache__
+/__pycache__
+*/__pycache__
 attached_assets/
 *.py[cod]
 *.pyo
